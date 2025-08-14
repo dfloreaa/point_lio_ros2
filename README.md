@@ -189,7 +189,7 @@ Step A: Run below
 ```
     cd ~/catkin_point_lio_unilidar
     source install/setup.bash
-    ros2 launch point_lio mapping_unilidar_l1.py
+    ros2 launch point_lio mapping_unilidar_l1.launch.py
 ```
 
 Step B: Run LiDAR's ros driver or play rosbag.
