@@ -111,7 +111,7 @@ For using lidar `L2`, you should download and build [unilidar_sdk2](https://gith
 ```bash
 git clone https://github.com/unitreerobotics/unilidar_sdk2.git
 
-cd unilidar_sdk/unitree_lidar_ros2
+cd unilidar_sdk2/unitree_lidar_ros2
 
 colcon build
 ```
