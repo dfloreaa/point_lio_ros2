@@ -63,6 +63,10 @@ void Preprocess::process(const sensor_msgs::msg::PointCloud2::SharedPtr &msg, Po
     }
 
     switch (lidar_type) {
+        case AVIA:
+            mid360_handler(msg);
+            break;
+
         case OUST64:
             oust64_handler(msg);
             break;
@@ -128,6 +132,65 @@ void Preprocess::process(const sensor_msgs::msg::PointCloud2::SharedPtr &msg, Po
 //     }
 
 // }
+
+
+void Preprocess::mid360_handler(
+        const sensor_msgs::msg::PointCloud2::SharedPtr &msg) {
+
+    pl_surf.clear();
+    pl_corn.clear();
+    pl_full.clear();
+
+    pcl::PointCloud<livox_ros2_pcl::Point> pl_orig;
+    pcl::fromROSMsg(*msg, pl_orig);
+
+    const int plsize = static_cast<int>(pl_orig.size());
+    if (plsize == 0) return;
+
+    pl_surf.reserve(plsize);
+
+    const double time_head = pl_orig.points.front().timestamp;
+    uint32_t valid_num = 0;
+
+    for (int i = 0; i < plsize; ++i) {
+        const auto &p = pl_orig.points[i];
+
+        if (p.line >= N_SCANS) continue;
+
+        if (!(((p.tag & 0x30) == 0x10) ||
+              ((p.tag & 0x30) == 0x00))) {
+            continue;
+        }
+
+        ++valid_num;
+
+        if (valid_num % point_filter_num != 0)
+            continue;
+
+        const double range2 =
+                p.x * p.x +
+                p.y * p.y +
+                p.z * p.z;
+
+        if (range2 <= blind * blind)
+            continue;
+
+        PointType added_pt;
+        added_pt.x = p.x;
+        added_pt.y = p.y;
+        added_pt.z = p.z;
+        added_pt.intensity = p.intensity;
+
+        added_pt.normal_x = 0;
+        added_pt.normal_y = 0;
+        added_pt.normal_z = 0;
+
+        added_pt.curvature =
+                (p.timestamp - time_head) * time_unit_scale;
+
+        pl_surf.points.push_back(added_pt);
+    }
+}
 
 void Preprocess::oust64_handler(const sensor_msgs::msg::PointCloud2::SharedPtr &msg) {
     pl_surf.clear();

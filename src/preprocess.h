@@ -105,6 +105,30 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(hesai_ros::Point,
                                           (std::uint16_t, ring, ring)
 )
 
+
+namespace livox_ros2_pcl {
+
+struct EIGEN_ALIGN16 Point {
+    PCL_ADD_POINT4D;
+    float intensity;
+    std::uint8_t tag;
+    std::uint8_t line;
+    double timestamp;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+} // namespace livox_ros2_pcl
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(livox_ros2_pcl::Point,
+    (float, x, x)
+    (float, y, y)
+    (float, z, z)
+    (float, intensity, intensity)
+    (std::uint8_t, tag, tag)
+    (std::uint8_t, line, line)
+    (double, timestamp, timestamp)
+)
+
 namespace ouster_ros {
     struct EIGEN_ALIGN16 Point {
         PCL_ADD_POINT4D;
@@ -161,6 +185,7 @@ public:
 private:
     // void avia_handler(const livox_ros_driver2::msg::CustomMsg::SharedPtr &msg);
 
+    void mid360_handler(const sensor_msgs::msg::PointCloud2::SharedPtr &msg);
     void oust64_handler(const sensor_msgs::msg::PointCloud2::SharedPtr &msg);
 
     void velodyne_handler(const sensor_msgs::msg::PointCloud2::SharedPtr &msg);
